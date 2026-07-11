@@ -1,7 +1,7 @@
+import AdminProducts from "./pages/AdminProducts";
+
 function App() {
-    return (
-        <h1>Tazza Du Vita</h1>
-    );
+    return <AdminProducts />;
 }
 
 export default App;
