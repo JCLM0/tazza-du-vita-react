@@ -75,3 +75,25 @@ export function deleteProduct(id) {
         JSON.stringify(updatedProducts)
     );
 }
+
+/**
+ * Actualiza un producto existente.
+ *
+ * @param {Object} updatedProduct
+ */
+export function updateProduct(updatedProduct) {
+    const products = getProducts();
+
+    const updatedProducts = products.map(product => {
+        if (product.id === updatedProduct.id) {
+            return updatedProduct;
+        }
+
+        return product;
+    });
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(updatedProducts)
+    );
+}

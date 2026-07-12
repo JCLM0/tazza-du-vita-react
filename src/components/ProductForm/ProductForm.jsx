@@ -3,7 +3,8 @@ import ProductList from "../ProductList/ProductList";
 import {
     saveProduct,
     getProducts,
-    deleteProduct as removeProduct
+    deleteProduct as removeProduct,
+    updateProduct
 } from "../../services/productService";
 
 /**
@@ -24,6 +25,12 @@ function ProductForm() {
     // Estado donde se almacenan los productos recuperados desde LocalStorage.
     const [products, setProducts] = useState([]);
 
+    // Estado utilizado para almacenar el texto escrito en el buscador.
+    const [search, setSearch] = useState("");
+
+    // Almacena el producto que se encuentra en edición.
+    const [editingProduct, setEditingProduct] = useState(null);
+
     /**
      * Obtiene los productos almacenados y actualiza
      * el estado para refrescar la interfaz.
@@ -41,6 +48,17 @@ function ProductForm() {
     function handleDelete(id) {
         removeProduct(id);
         loadProducts();
+    }
+
+    // Carga la información del producto seleccionado en el formulario.
+    function handleEdit(product) {
+        setEditingProduct(product);
+
+        setProductName(product.name);
+        setProductCategory(product.category);
+        setProductPrice(product.price);
+        setProductStock(product.stock);
+        setProductDescription(product.description);
     }
 
     // Carga automáticamente los productos cuando
@@ -69,7 +87,7 @@ function ProductForm() {
 
         // Crear el objeto producto a partir de los datos ingresados.
         const product = {
-            id: Date.now(),
+            id: editingProduct ? editingProduct.id : Date.now(),
             name: productName,
             category: productCategory,
             price: Number(productPrice),
@@ -77,9 +95,16 @@ function ProductForm() {
             description: productDescription
         };
 
-        // Guardar el producto y actualizar la lista.
-        saveProduct(product);
+        // Si estamos editando, actualizamos el producto.
+        // De lo contrario, registramos uno nuevo.
+        if (editingProduct) {
+            updateProduct(product);
+        } else {
+            saveProduct(product);
+        }
+
         loadProducts();
+        setEditingProduct(null);
 
         // Mostrar el producto registrado en consola para pruebas.
         console.log("Producto registrado:", product);
@@ -90,6 +115,8 @@ function ProductForm() {
         setProductPrice("");
         setProductStock("");
         setProductDescription("");
+
+        setEditingProduct(null);
     }
 
     /**
@@ -127,6 +154,16 @@ function ProductForm() {
 
         return true;
     }
+
+    // Filtra los productos por nombre o categoría según el texto ingresado.
+    const filteredProducts = products.filter(product => {
+        const searchText = search.toLowerCase();
+
+        return (
+            product.name.toLowerCase().includes(searchText) ||
+            product.category.toLowerCase().includes(searchText)
+        );
+    });
 
     return (
 
@@ -216,14 +253,33 @@ function ProductForm() {
                 </div>
 
                 <button type="submit">
-                    Guardar producto
+                    {editingProduct ? "Actualizar producto" : "Guardar producto"}
                 </button>
             </form>
 
+            <div className="search">
+                <label htmlFor="searchProduct">
+                    Buscar producto
+                </label>
+
+                <input
+                    type="text"
+                    id="searchProduct"
+                    placeholder="Buscar por nombre..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+            </div>
+
+            <p className="total-products">
+                Total de productos registrados: <strong>{products.length}</strong>  
+            </p>
+
             {/* Componente encargado de mostrar los productos registrados */}
             <ProductList
-                products={products}
+                products={filteredProducts}
                 onDelete={handleDelete}
+                onEdit={handleEdit}
             />
         </section>
     );

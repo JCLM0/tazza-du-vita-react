@@ -6,10 +6,16 @@
  * @param {Array} props.products Lista de productos.
  * @param {Function} props.onDelete Función para eliminar un producto.
  */
-function ProductList({ products, onDelete }) {
+function ProductList({ products, onDelete, onEdit }) {
     return (
         <section>
             <h2>Productos registrados</h2>
+
+            {products.length === 0 ? (
+
+            <p>No hay productos registrados.</p>
+
+            ) : (
 
             <table>
                 <thead>
@@ -18,27 +24,32 @@ function ProductList({ products, onDelete }) {
                         <th>Categoría</th>
                         <th>Precio</th>
                         <th>Stock</th>
-                        <th>Acción</th>
+                        <th>Editar</th>
+                        <th>Eliminar</th>
                     </tr>
                 </thead>
-                <tbody>
-                    {/* Recorrer todos los productos para generar cada fila de la tabla */}
-                    {products.map(product => (
 
+                <tbody>
+                    {products.map(product => (
                         <tr key={product.id}>
+
                             <td>{product.name}</td>
                             <td>{product.category}</td>
                             <td>${product.price}</td>
                             <td>{product.stock}</td>
+
                             <td>
-                                <button onClick={() => onDelete(product.id)}>
-                                    Eliminar
-                                </button>
+                                <button className="edit-btn" type="button" onClick={() => onEdit(product)}> Editar </button>
+                            </td>
+
+                            <td>
+                                <button className="delete-btn" type="button" onClick={() => onDelete(product.id)}> Eliminar </button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+            )}
         </section>
     );
 }
